@@ -1,0 +1,44 @@
+# Docker files
+Dockerfile
+Dockerfile.study_bot_fastapi
+Dockerfile.archive
+.dockerignore
+
+# IDE files
+.idea
+.vscode
+.komodoproject
+.sublime-project
+.sublime-workspace
+.atom
+
+# Git files
+**/.git
+**/.github
+**/.gitignore
+**/.gitlab-ci.yml
+**/.gitmodules
+
+# Temp files
+**/.cache
+**/.pyc
+**/.pyo
+**/.pyd
+__pycache__
+.Python
+../temp
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.env
+
+# Other files
+**/.md
+**/db.sqlite3
+node_modules
+report.sh
