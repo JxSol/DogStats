@@ -58,11 +58,15 @@ class MongoUpdate(MongoBase, abc.ABC):
     )
 
 
-class AccessRole(enum.StrEnum):
+# * ================================================================================================
+# * ================================================================================================
+
+
+class UserRole(enum.StrEnum):
     """Роли доступа."""
 
     ADMIN = "admin"
-    CATHER = "catcher"
+    CATCHER = "catcher"
     GUEST = "guest"
 
 
@@ -71,7 +75,7 @@ class UserBase(MongoBase):
 
     tg_id: TgUserID
     name: str
-    access_role: AccessRole
+    role: UserRole
 
 
 class UserRead(UserBase, MongoRead):
@@ -89,7 +93,52 @@ class UserCreate(UserBase, MongoCreate):
 class UserUpdate(MongoUpdate):
     """Модель для чтения пользователя."""
 
-    access_role: AccessRole | None = None
+    role: UserRole | None = None
+
+
+class UserFlag(BaseModel):
+    """Модель для использования в интерфейсе."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    tg_id: TgUserID
+    name: str
+    role: UserRole
+    is_selected: bool = False
+
+
+# * ================================================================================================
+# * ================================================================================================
+
+
+class InviteBase(MongoBase):
+    """Базовая модель для приглашения."""
+
+    password: str
+    role: UserRole
+    username: str
+
+
+class InviteRead(InviteBase, MongoRead):
+    """Базовая модель для приглашения."""
+
+    is_expired: bool
+
+
+class InviteCreate(InviteBase, MongoCreate):
+    """Базовая модель для приглашения."""
+
+    is_expired: bool = False
+
+
+class InviteUpdate(MongoUpdate):
+    """Базовая модель для приглашения."""
+
+    is_expired: bool = True
+
+
+# * ================================================================================================
+# * ================================================================================================
 
 
 class AnimalType(enum.StrEnum):
@@ -187,6 +236,9 @@ class AnimalRecordRead(AnimalRecordBase, MongoRead):
     catch_place: str = Field(
         title="Место отлова",
     )
+    created_by: TgUserID = Field(
+        title="Автор записи",
+    )
 
 
 class AnimalRecordCreate(AnimalRecordBase, MongoCreate):
@@ -222,6 +274,9 @@ class AnimalRecordCreate(AnimalRecordBase, MongoCreate):
     )
     catch_place: str = Field(
         title="Место отлова",
+    )
+    created_by: TgUserID = Field(
+        title="Автор записи",
     )
 
 

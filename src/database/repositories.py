@@ -8,9 +8,20 @@ from pymongo import ReturnDocument
 from pymongo.errors import ConnectionFailure, OperationFailure
 from pymongo.results import DeleteResult, InsertManyResult, InsertOneResult, UpdateResult
 
-from .models import AnimalRecordRead, MongoCreate
+from .models import (
+    AnimalRecordRead,
+    InviteRead,
+    InviteUpdate,
+    MongoCreate,
+)
 from .models import MongoRead as _MongoRead
-from .models import MongoUpdate, UserRead
+from .models import (
+    MongoUpdate,
+    TgUserID,
+    UserCreate,
+    UserRead,
+    UserRole,
+)
 
 MongoDict = Mapping[str, Any]  # * Часть сырого документа Mongo
 
@@ -188,6 +199,33 @@ class UserRepository(BaseRepository):
         else:
             logger.info(f"Индекс tg_id в коллекции {self.collection} уже существует.")
 
+    async def get_by_tg_id(self, tg_id: TgUserID) -> UserRead | None:
+        """Получить пользователя по tg_id."""
+        return await self.get_one({"tg_id": tg_id})
+
+    async def get_admins(self) -> AsyncGenerator[UserRead, None]:
+        """Получить список всех админов."""
+        return self.get_bulk({"role": UserRole.ADMIN.value})
+
+    async def is_admin(self, tg_id: TgUserID) -> bool:
+        """Проверить, обладает ли пользователь правами админа."""
+        user = await self.get_by_tg_id(tg_id)
+
+        return user is not None and user.role == UserRole.ADMIN
+
+    async def add_admin_access(self, tg_id: TgUserID) -> UserRead:
+        """Добавить доступ администратору."""
+        user = await self.get_by_tg_id(tg_id)
+
+        if user is None:
+            model = UserCreate(
+                tg_id=tg_id,
+                role=UserRole.ADMIN,
+            )
+            user = await self.create_one(MongoCreate(tg_id=tg_id, role=UserRole.ADMIN.value))
+
+        await self.update_one({"tg_id": tg_id}, MongoUpdate(role=UserRole.ADMIN.value))
+
 
 class AnimalRecordRepository(BaseRepository):
     """Репозиторий для работы с записями о животных."""
@@ -196,3 +234,33 @@ class AnimalRecordRepository(BaseRepository):
     read_model = AnimalRecordRead
 
     async def add_indexes(self) -> None: ...
+
+
+class InviteRepository(BaseRepository):
+    """Репозиторий для работы с приглашениями."""
+
+    collection = "invites"
+    read_model = InviteRead
+
+    async def add_indexes(self) -> None:
+        """
+        Добавление индексов в таблицу.
+
+        Добавляет уникальные индексы для поля `password`.
+        """
+        name = f"UQ_{self.collection}_password"
+        indexes = await self.client.index_information()
+        if indexes.get(name) is None:
+            await self.client.create_index(
+                [('password', pymongo.ASCENDING)],
+                unique=True,
+                sparse=True,
+                name=name,
+            )
+            logger.success(f"Индекс password в коллекции {self.collection} создан.")
+        else:
+            logger.info(f"Индекс password в коллекции {self.collection} уже существует.")
+
+    async def expire(self, password: str) -> InviteRead | None:
+        """Пометить приглашение, как истёкшее."""
+        return await self.update_one({"password": password}, InviteUpdate())

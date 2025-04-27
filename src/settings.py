@@ -44,6 +44,7 @@ class TelegramSettings(BaseConfig):
     model_config = SettingsConfigDict(env_prefix='tg_')
 
     bot_token: str
+    bot_username: str
     admin_ids: list[int]
 
 

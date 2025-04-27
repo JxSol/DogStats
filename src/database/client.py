@@ -53,6 +53,6 @@ class MongoClient:
 
 
 client = MongoClient(
-    settings.local_db.db_dsn,
-    'welcome_bot_db',
+    settings.db.db_dsn,
+    'dog_stats_db',
 )
