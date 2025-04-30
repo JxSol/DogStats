@@ -1,0 +1,54 @@
+name: dogs_stats
+
+services:
+
+  db:
+    container_name: dogs_stats_db
+    image: mongo:8.0
+    ports:
+      - ${DB_PORT}:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_volume:/data/db
+    restart: always
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:${DB_PORT}/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+  db_gui:
+    container_name: dogs_stats_db_gui
+    image: mongo-express
+    profiles:
+      - dev
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${DB_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${DB_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/
+      ME_CONFIG_BASICAUTH: false
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    container_name: dogs_stats_app
+    build: .
+    env_file: .env
+    ports:
+      - ${APP_PORT}:8000
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  db_volume:
+    name: dogs_stats_db_volume
