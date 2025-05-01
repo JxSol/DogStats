@@ -4,8 +4,16 @@ from loguru import logger
 
 import settings
 from database.client import client
-from database.models import InviteCreate, InviteRead, UserCreate, UserRead, UserRole
-from database.repositories import InviteRepository, UserRepository
+from database.models import (
+    AnimalRecordCreate,
+    AnimalRecordRead,
+    InviteCreate,
+    InviteRead,
+    UserCreate,
+    UserRead,
+    UserRole,
+)
+from database.repositories import AnimalRecordRepository, InviteRepository, UserRepository
 
 
 async def init_indexes() -> None:
@@ -99,3 +107,9 @@ async def user_delete(tg_id: int) -> None:
         logger.success(f"Пользователь {tg_id} был удален.")
     else:
         logger.error(f"Пользователь {tg_id} не был удален.")
+
+
+async def add_animal_record(model: AnimalRecordCreate) -> AnimalRecordRead:
+    """Добавить запись о животном."""
+    repo = AnimalRecordRepository(client.db)
+    return await repo.create_one(model)

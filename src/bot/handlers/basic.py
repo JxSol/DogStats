@@ -1,6 +1,7 @@
-from aiogram import Router
+from aiogram import F, Router
 from aiogram.filters import CommandObject, CommandStart
-from aiogram.types import Message
+from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery, Message
 from loguru import logger
 
 from bot.keyboards.basic import build_main_keyboard
@@ -42,3 +43,15 @@ async def cmd_start(message: Message, user_role: UserRole | None, command: Comma
         return
 
     await message.answer(text="Ссылка недействительна 😿")
+
+
+@router.callback_query(F.data == "cancel")
+async def handle_cb_cancel(
+    callback: CallbackQuery,
+    state: FSMContext,
+) -> None:
+    """Обработка нажатия кнопки отмены."""
+    logger.debug(f"Пользователь {callback.from_user.id} отменил действие.")
+    await state.clear()
+    await callback.answer("Действие отменено.")
+    await callback.message.delete()

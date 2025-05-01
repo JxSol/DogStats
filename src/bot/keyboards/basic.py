@@ -41,6 +41,20 @@ def build_confirm_cancel(
     return builder.as_markup()
 
 
+def build_skip_cancel(
+    skip_callback: str | CallbackData = 'skip',
+    cancel_callback: str | CallbackData = 'cancel',
+) -> InlineKeyboardMarkup:
+    """Формирует клавиатуру пропуска и отмены."""
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text="⏭ Пропустить шаг", callback_data=skip_callback)
+    builder.attach(cancel_builder(cancel_callback))
+
+    builder.adjust(2)
+    return builder.as_markup()
+
+
 def build_main_keyboard(role: UserRole) -> ReplyKeyboardMarkup:
     """Формирует основную клавиатуру."""
     builder = ReplyKeyboardBuilder()

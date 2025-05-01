@@ -6,7 +6,7 @@ from aiogram.fsm.storage.mongo import MongoStorage
 from loguru import logger
 
 import settings
-from bot.handlers import roles_router, start_router
+from bot.handlers import animals_router, roles_router, start_router
 from bot.logic import add_superadmins_from_venv, init_indexes
 from bot.middleware import LoggerMiddleware, UserRoleMiddleware
 from database import client
@@ -38,6 +38,9 @@ async def main():
     dp.include_router(roles_router)
     logger.success(f'{roles_router} добавлен.')
 
+    dp.include_router(animals_router)
+    logger.success(f'{animals_router} добавлен.')
+
     # Инициализация мидлварей
     logger.info("Инициализирован процесс добавления миддлваров...")
     dp.update.outer_middleware(LoggerMiddleware())
@@ -50,12 +53,12 @@ async def main():
     bot = Bot(
         token=settings.tg.bot_token,
     )
+    await bot.delete_webhook(drop_pending_updates=True)
 
     # Запуск бота
     logger.success("Ожидание входящих сообщений...")
     await dp.start_polling(
         bot,
-        skip_updates=True,
     )
 
 

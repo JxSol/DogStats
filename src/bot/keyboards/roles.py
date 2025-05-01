@@ -59,10 +59,7 @@ def build_user_list_menu(role: UserRole) -> InlineKeyboardMarkup:
 
     builder.button(
         text="🗑️ Перейти к удалению",
-        callback_data=UserListCallbackFactory(
-            action=UserListAction.DEL_SELECT,
-            role=role.value
-        ),
+        callback_data=UserListCallbackFactory(action=UserListAction.DEL_SELECT, role=role.value),
     )
 
     builder.attach(back_builder('role_control'))
@@ -87,8 +84,7 @@ def build_user_list_delete(user_list: list[UserFlag]) -> InlineKeyboardMarkup:
     builder.button(
         text="🗑️ Удалить помеченных пользователей",
         callback_data=UserListCallbackFactory(
-            action=UserListAction.DEL_CONFIRM,
-            role=user_list[0].role.value
+            action=UserListAction.DEL_CONFIRM, role=user_list[0].role.value
         ),
     )
 

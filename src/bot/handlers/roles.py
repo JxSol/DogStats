@@ -170,8 +170,7 @@ async def handle_cb_user_list_delete(
 
 
 @router.callback_query(
-    UserDeleteState.select,
-    UserListCallbackFactory.filter(F.action == UserListAction.DEL_SELECT)
+    UserDeleteState.select, UserListCallbackFactory.filter(F.action == UserListAction.DEL_SELECT)
 )
 async def handle_st_user_select(
     callback: CallbackQuery,
@@ -189,17 +188,13 @@ async def handle_st_user_select(
 
     await state.update_data(user_list=[user.model_dump() for user in user_list])
 
-    await callback.answer()
-    await callback.message.delete()
-    await callback.message.answer(
-        text="Выберите пользователей для удаления:",
+    await callback.message.edit_reply_markup(
         reply_markup=build_user_list_delete(user_list),
     )
 
 
 @router.callback_query(
-    UserDeleteState.select,
-    UserListCallbackFactory.filter(F.action == UserListAction.DEL_CONFIRM)
+    UserDeleteState.select, UserListCallbackFactory.filter(F.action == UserListAction.DEL_CONFIRM)
 )
 async def handle_cb_user_list_delete_selected(
     callback: CallbackQuery,

@@ -1,3 +1,4 @@
+import datetime as dt
 from typing import ClassVar
 
 from pydantic import MongoDsn
@@ -50,3 +51,4 @@ class TelegramSettings(BaseConfig):
 
 db = DatabaseSettings()
 tg = TelegramSettings()
+TZINFO = dt.timezone(dt.timedelta(hours=+5))  # ! UTC+3 !

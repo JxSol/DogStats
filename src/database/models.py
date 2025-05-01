@@ -154,11 +154,16 @@ class Sex(enum.StrEnum):
 
     MALE = "Самец"
     FEMALE = "Самка"
-    UNKNOWN = "Неопределенно"
+    UNDEFINED = "Неопределенно"
 
 
 class AnimalRecordBase(MongoBase):
     """Базовая модель для записи о животном."""
+
+    features: str | None = Field(
+        None,
+        title="Особенности",
+    )
 
     chip_id: str | None = Field(
         None,
@@ -217,9 +222,6 @@ class AnimalRecordRead(AnimalRecordBase, MongoRead):
     color: str = Field(
         title="Окрас",
     )
-    features: str = Field(
-        title="Особенности",
-    )
 
     is_sterilized: bool = Field(
         False,
@@ -255,9 +257,6 @@ class AnimalRecordCreate(AnimalRecordBase, MongoCreate):
     )
     color: str = Field(
         title="Окрас",
-    )
-    features: str = Field(
-        title="Особенности",
     )
 
     is_sterilized: bool = Field(
@@ -298,10 +297,6 @@ class AnimalRecordUpdate(AnimalRecordBase, MongoUpdate):
     color: str | None = Field(
         None,
         title="Окрас",
-    )
-    features: str | None = Field(
-        None,
-        title="Особенности",
     )
 
     is_sterilized: bool | None = Field(
