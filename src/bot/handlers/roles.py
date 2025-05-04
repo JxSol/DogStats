@@ -111,7 +111,6 @@ async def handle_st_invite_user_input_name(message: Message, state: FSMContext):
     await state.set_state(InviteUserState.confirm)
     data = await state.get_data()
 
-    await message.answer_photo()
     await message.bot.delete_message(message.chat.id, message.message_id - 1)
     await message.answer(
         text=(
