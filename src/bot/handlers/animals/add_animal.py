@@ -12,7 +12,12 @@ from bot.keyboards.animals import (
     build_input_date,
     geo_button,
 )
-from bot.keyboards.basic import build_confirm_cancel, build_main_keyboard, build_skip_cancel, cancel_builder
+from bot.keyboards.basic import (
+    build_confirm_cancel,
+    build_main_keyboard,
+    build_skip_cancel,
+    cancel_builder,
+)
 from bot.logic import add_animal_record
 from bot.states import AnimalAddState
 from database.models import AnimalRecordCreate, AnimalType, Sex, UserRole
@@ -457,7 +462,9 @@ async def handle_cb_input_transfer_date(
     state: FSMContext,
 ) -> None:
     """Обработка ввода даты транспортировки в приют."""
-    logger.debug(f"Пользователь {callback.from_user.id} перешёл к этапу ввода даты транспортировки в приют.")
+    logger.debug(
+        f"Пользователь {callback.from_user.id} перешёл к этапу ввода даты транспортировки в приют."
+    )
 
     await callback.answer()
     await callback.message.delete()

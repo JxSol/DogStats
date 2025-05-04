@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
+from bot.callback_factories import AnimalRecordCallbackFactory
 from bot.keyboards.basic import build_skip_cancel, cancel_builder
 from database.models import AnimalType, Sex
 
@@ -83,4 +84,33 @@ def build_choose_sex(selected: Sex | None = None) -> InlineKeyboardMarkup:
         builder.attach(cancel_builder())
 
     builder.adjust(3, 1)
+    return builder.as_markup()
+
+
+def display_paginator(
+    title: str,
+    prev_item: str | None,
+    next_item: str | None,
+) -> InlineKeyboardMarkup:
+    """Формирует клавиатуру для переключения карточек."""
+    builder = InlineKeyboardBuilder()
+
+    if prev_item:
+        builder.button(
+            text="⬅️",
+            callback_data=AnimalRecordCallbackFactory(item_id=prev_item),
+        )
+
+    builder.button(
+        text=title,
+        callback_data="dummy",
+    )
+
+    if next_item:
+        builder.button(
+            text="➡️",
+            callback_data=AnimalRecordCallbackFactory(item_id=next_item),
+        )
+
+    builder.adjust(3)
     return builder.as_markup()

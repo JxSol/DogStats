@@ -31,3 +31,9 @@ class AnimalAddState(StatesGroup):
     input_transfer_date = State()
     input_comment = State()
     confirm = State()
+
+
+class DisplayAnimalState(StatesGroup):
+    """Состояние для отображения информации о животном."""
+
+    display = State()

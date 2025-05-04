@@ -82,4 +82,4 @@ def build_main_keyboard(role: UserRole) -> ReplyKeyboardMarkup:
     if role in (UserRole.CATCHER, UserRole.ADMIN):
         builder.adjust(2, 1)
 
-    return builder.as_markup()
+    return builder.as_markup(one_time_keyboard=True, resize_keyboard=True)

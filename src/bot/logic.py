@@ -1,4 +1,5 @@
 import secrets
+from typing import AsyncGenerator
 
 from loguru import logger
 
@@ -9,6 +10,7 @@ from database.models import (
     AnimalRecordRead,
     InviteCreate,
     InviteRead,
+    TgUserID,
     UserCreate,
     UserRead,
     UserRole,
@@ -113,3 +115,18 @@ async def add_animal_record(model: AnimalRecordCreate) -> AnimalRecordRead:
     """Добавить запись о животном."""
     repo = AnimalRecordRepository(client.db)
     return await repo.create_one(model)
+
+
+async def get_animal_display(
+    animal_id: str | None,
+    user_filter: TgUserID | None,
+) -> dict[str, AnimalRecordRead | None]:
+    """Получить запись о животном."""
+    repo = AnimalRecordRepository(client.db)
+    _filter = {"created_by": user_filter} if user_filter else {}
+
+    return await repo.get_3_animals(
+        filter=_filter,
+        sort_field='created_at',
+        target_id=animal_id,
+    )

@@ -1,6 +1,7 @@
 import abc
 from typing import Any, AsyncGenerator, Mapping, Sequence, Type
 
+from bson import ObjectId
 import pymongo
 from loguru import logger
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -234,6 +235,58 @@ class AnimalRecordRepository(BaseRepository):
     read_model = AnimalRecordRead
 
     async def add_indexes(self) -> None: ...
+
+    async def get_3_animals(
+        self,
+        filter: MongoDict,
+        sort_field: str,
+        target_id: str | None = None,
+    ) -> dict[str, AnimalRecordRead | None]:
+        """Получает данные товара для пагинации из MongoDB."""
+        if target_id:
+            target_model = await self.get_one({"_id": ObjectId(target_id)})
+            if not target_model:
+                logger.error(f"Ошибка при получении документа {target_id}")
+                raise OperationFailure("Ошибка при получении документа.")
+        else:
+            # Если ID не указан, ищем самый первый товар по сортировке
+            cursor = self.client.find(filter).sort(sort_field, 1).limit(1)
+            target_data = await cursor.to_list(length=1)
+            if not target_data:
+                logger.error("Ошибка при получении документа с заданными параметрами")
+                raise OperationFailure("Ошибка при получении документа.")
+            target_model = AnimalRecordRead.model_validate(target_data[0])
+
+        prev_cursor = (
+            self.client.find(
+                {**filter, sort_field: {"$lt": target_model.model_dump(include={sort_field})[sort_field]}}
+            )
+            .sort(sort_field, -1)
+            .limit(1)
+        )
+        prev_data = await prev_cursor.to_list(length=1)
+        prev_model = AnimalRecordRead.model_validate(prev_data[0]) if prev_data else None
+
+        next_cursor = (
+            self.client.find(
+                {**filter, sort_field: {'$gt': target_model.model_dump(include={sort_field})[sort_field]}}
+            )
+            .sort(sort_field, 1)
+            .limit(1)
+        )
+        next_data = await next_cursor.to_list(length=1)
+        next_model = AnimalRecordRead.model_validate(next_data[0]) if next_data else None
+
+        logger.success(
+            f"Документы получены успешно. Количество: "
+            f"{bool(prev_model) + bool(target_model) + bool(next_model)}."
+        )
+
+        return {
+            'prev': prev_model,
+            'target': target_model,
+            'next': next_model,
+        }
 
 
 class InviteRepository(BaseRepository):

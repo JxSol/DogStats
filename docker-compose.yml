@@ -5,8 +5,8 @@ services:
   db:
     container_name: dogs_stats_db
     image: mongo:8.0
-    ports:
-      - ${DB_PORT}:27017
+    expose:
+      - ${DB_PORT}
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}

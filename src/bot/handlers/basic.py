@@ -55,3 +55,11 @@ async def handle_cb_cancel(
     await state.clear()
     await callback.answer("Действие отменено.")
     await callback.message.delete()
+
+
+@router.callback_query(F.data == "dummy")
+async def handle_cb_dummy(
+    callback: CallbackQuery,
+) -> None:
+    """Обработка нажатия кнопки-пустышки."""
+    await callback.answer()

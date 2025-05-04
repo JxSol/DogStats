@@ -17,3 +17,15 @@ class UserListCallbackFactory(CallbackData, prefix='user_list'):
     role: str
     action: str = UserListAction.DISPLAY
     selected: int | None = None
+
+
+class ItemPaginatorCallbackFactory(CallbackData, prefix='item'):
+    """Фабрика коллбеков для управления записями о животных."""
+
+    item_id: str
+
+
+class AnimalRecordCallbackFactory(ItemPaginatorCallbackFactory, prefix='animal'):
+    """Фабрика коллбеков для управления записями о животных."""
+
+    action: str = 'display'
